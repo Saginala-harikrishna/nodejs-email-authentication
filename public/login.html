@@ -84,4 +84,31 @@ button:hover {
     <p>Don't have an account? <a href="register.html">Register here</a></p>
   </div>
 </body>
+<script>
+  const form = document.querySelector('form');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = form.email.value;
+    const password = form.password.value;
+
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      // Save user data to localStorage
+      localStorage.setItem("user", JSON.stringify(result.user));
+      window.location.href = "dashboard.html";
+    } else {
+      alert(result.message);
+    }
+  });
+</script>
+
 </html>
