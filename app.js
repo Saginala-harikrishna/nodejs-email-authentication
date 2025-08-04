@@ -1,17 +1,17 @@
 const express = require('express');
 const path = require('path');
 const app = express();
+const authRoutes = require('./routes/authRoutes');
 
-// Middleware to serve static files from 'public' directory
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/api/auth', authRoutes);
 
-// Redirect root URL to login.html (no need to include 'public' in the path)
 app.get('/', (req, res) => {
-  res.redirect('/login.html');
+  res.redirect('/register.html');
 });
 
-// Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
