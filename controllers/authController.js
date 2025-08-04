@@ -95,3 +95,41 @@ exports.loginUser = async (req, res) => {
     res.status(500).json({ message: 'Login failed.' });
   }
 };
+
+// ==========================
+// Reset Password Controller
+// ==========================
+exports.resetPassword = async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+
+  try {
+    const [rows] = await db.execute(
+      'SELECT * FROM otps WHERE email = ? ORDER BY created_at DESC LIMIT 1',
+      [email]
+    );
+
+    if (!rows.length) {
+      return res.status(400).json({ message: 'No OTP found for this email.' });
+    }
+
+    const record = rows[0];
+
+    if (record.otp !== otp) {
+      return res.status(400).json({ message: 'Invalid OTP.' });
+    }
+
+    if (new Date(record.expires_at) < new Date()) {
+      return res.status(400).json({ message: 'OTP expired.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await db.execute('UPDATE users SET password = ? WHERE email = ?', [hashedPassword, email]);
+    await db.execute('DELETE FROM otps WHERE email = ?', [email]);
+
+    res.status(200).json({ message: 'Password reset successful.' });
+  } catch (err) {
+    console.error('Reset Password Error:', err);
+    res.status(500).json({ message: 'Password reset failed.' });
+  }
+};

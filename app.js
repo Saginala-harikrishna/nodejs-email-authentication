@@ -8,7 +8,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {
-  res.redirect('/register.html');
+  res.redirect('/login.html');
 });
 
 const PORT = 3000;
